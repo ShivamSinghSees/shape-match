@@ -1,82 +1,110 @@
-import { useState, useCallback } from "react";
-import { Shape, GameState } from "../types/game";
-
-const SHAPES = ["circle", "square", "triangle", "star"] as const;
-const COLORS = [
-  "#FF6B6B",
-  "#4ECDC4",
-  "#45B7D1",
-  "#96CEB4",
-  "#FFEEAD",
-  "#D4A5A5",
-];
-
-const createInitialShapes = () => {
-  const shapes: Shape[] = [];
-  SHAPES.forEach((type) => {
-    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-    // Create pairs of shapes
-    for (let i = 0; i < 2; i++) {
-      shapes.push({
-        id: `${type}-${i}`,
-        type,
-        color,
-        matched: false,
-      });
-    }
-  });
-  return shapes.sort(() => Math.random() - 0.5);
-};
+import { useState, useCallback, useEffect } from "react";
+import { GameState } from "../types/game";
+import { getRandomShapes } from "../utils/shapeUtils";
+import { playSound } from "../utils/soundUtlis";
+import { CARD_FLIP_SFX, CARD_MATCH_SFX, PAIR_COUNT } from "../utils/constants";
 
 export const useGame = () => {
   const [gameState, setGameState] = useState<GameState>({
-    shapes: createInitialShapes(),
+    shapes: getRandomShapes(PAIR_COUNT),
     selectedShape: null,
     score: 0,
     isComplete: false,
   });
 
-  const handleShapeClick = useCallback((shapeId: string) => {
-    setGameState((prev) => {
-      const clickedShape = prev.shapes.find((s) => s.id === shapeId);
-      if (!clickedShape || clickedShape.matched) return prev;
+  const [matchCheckInProgress, setMatchCheckInProgress] = useState(false);
 
-      if (!prev.selectedShape) {
-        return {
-          ...prev,
-          selectedShape: clickedShape,
-        };
-      }
+  const handleShapeClick = useCallback(
+    (shapeId: string) => {
+      if (matchCheckInProgress) return;
 
-      if (prev.selectedShape.id === shapeId) return prev;
+      setGameState((prev) => {
+        const clickedShape = prev.shapes.find((s) => s.id === shapeId);
+        if (!clickedShape || clickedShape.matched) return prev;
 
-      const isMatch =
-        prev.selectedShape.type === clickedShape.type &&
-        prev.selectedShape.color === clickedShape.color;
-
-      const updatedShapes = prev.shapes.map((shape) => {
-        if (
-          shape.id === clickedShape.id ||
-          shape.id === prev.selectedShape?.id
-        ) {
+        if (!prev.selectedShape) {
           return {
-            ...shape,
-            matched: isMatch,
+            ...prev,
+            selectedShape: clickedShape,
           };
         }
-        return shape;
+
+        if (prev.selectedShape.id === shapeId) return prev;
+
+        const isMatch =
+          prev.selectedShape.type === clickedShape.type &&
+          prev.selectedShape.color === clickedShape.color;
+
+        if (isMatch) {
+          playSound(CARD_MATCH_SFX);
+        } else {
+          playSound(CARD_FLIP_SFX);
+        }
+
+        setMatchCheckInProgress(true);
+
+        if (!isMatch) {
+          return {
+            ...prev,
+            selectedShape: clickedShape,
+          };
+        }
+
+        const updatedShapes = prev.shapes.map((shape) => {
+          if (
+            shape.id === clickedShape.id ||
+            shape.id === prev.selectedShape?.id
+          ) {
+            return {
+              ...shape,
+              matched: true,
+            };
+          }
+          return shape;
+        });
+
+        const allMatched = updatedShapes.every((shape) => shape.matched);
+
+        return {
+          shapes: updatedShapes,
+          selectedShape: null,
+          score: prev.score + 10,
+          isComplete: allMatched,
+        };
       });
+    },
+    [matchCheckInProgress]
+  );
 
-      const allMatched = updatedShapes.every((shape) => shape.matched);
+  useEffect(() => {
+    if (matchCheckInProgress) {
+      const timer = setTimeout(() => {
+        setGameState((prev) => {
+          const selectedShape = prev.selectedShape;
+          if (!selectedShape) return prev;
 
-      return {
-        shapes: updatedShapes,
-        selectedShape: null,
-        score: isMatch ? prev.score + 10 : prev.score,
-        isComplete: allMatched,
-      };
-    });
-  }, []);
+          const matchedPair = prev.shapes.find(
+            (s) =>
+              s.id !== selectedShape.id &&
+              s.type === selectedShape.type &&
+              s.color === selectedShape.color
+          );
+
+          if (!matchedPair) {
+            return {
+              ...prev,
+              selectedShape: null,
+            };
+          }
+
+          return prev;
+        });
+        setMatchCheckInProgress(false);
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [matchCheckInProgress]);
 
   return {
     gameState,

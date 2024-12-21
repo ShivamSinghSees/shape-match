@@ -1,24 +1,23 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Shape } from "./Shape";
+import { Card } from "./Card";
 import { GameState } from "../types/game";
-// import useSound from "use-sound";
+// import useSound from 'use-sound';
 
 interface GameBoardProps {
   gameState: GameState;
-  onShapeClick: (shapeId: string) => void;
+  onCardClick: (shapeId: string) => void;
 }
 
 export const GameBoard: React.FC<GameBoardProps> = ({
   gameState,
-  onShapeClick,
+  onCardClick,
 }) => {
-  // const [playMatch] = useSound("/sounds/match.mp3");
-  // const [playSelect] = useSound("/sounds/select.mp3");
+  // const [playMatch] = useSound('/sounds/match.mp3');
+  // const [playSelect] = useSound('/sounds/select.mp3');
 
-  const handleShapeClick = (shapeId: string) => {
-    // playSelect();
-    onShapeClick(shapeId);
+  const handleCardClick = (shapeId: string) => {
+    onCardClick(shapeId);
   };
 
   return (
@@ -28,11 +27,11 @@ export const GameBoard: React.FC<GameBoardProps> = ({
       className="grid grid-cols-4 gap-4 p-4 bg-blue-50 rounded-xl shadow-xl"
     >
       {gameState.shapes.map((shape) => (
-        <Shape
+        <Card
           key={shape.id}
           shape={shape}
-          onClick={() => handleShapeClick(shape.id)}
-          isSelected={gameState.selectedShape?.id === shape.id}
+          onClick={() => !shape.matched && handleCardClick(shape.id)}
+          isFlipped={shape.matched || shape.id === gameState.selectedShape?.id}
         />
       ))}
     </motion.div>

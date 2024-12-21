@@ -1,9 +1,14 @@
+import { IconType } from "react-icons";
+
 export type Shape = {
   id: string;
-  type: "circle" | "square" | "triangle" | "star";
+  type: string;
+  icon: IconType;
   color: string;
   matched: boolean;
 };
+
+export type ShapeComponentType = "circle" | "square" | "triangle" | "star";
 
 export type GameState = {
   shapes: Shape[];
