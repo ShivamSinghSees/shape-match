@@ -24,7 +24,7 @@ export const GameBoard: React.FC<GameBoardProps> = ({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="grid grid-cols-4 gap-4 p-4 bg-blue-50 rounded-xl shadow-xl"
+      className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-blue-50 rounded-xl shadow-xl"
     >
       {gameState.shapes.map((shape) => (
         <Card

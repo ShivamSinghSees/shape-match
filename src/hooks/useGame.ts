@@ -2,7 +2,12 @@ import { useState, useCallback, useEffect } from "react";
 import { GameState } from "../types/game";
 import { getRandomShapes } from "../utils/shapeUtils";
 import { playSound } from "../utils/soundUtlis";
-import { CARD_FLIP_SFX, CARD_MATCH_SFX, PAIR_COUNT } from "../utils/constants";
+import {
+  CARD_FLIP_SFX,
+  CARD_MATCH_SFX,
+  GAME_COMPLETE_SFX,
+  PAIR_COUNT,
+} from "../utils/constants";
 
 export const useGame = () => {
   const [gameState, setGameState] = useState<GameState>({
@@ -14,6 +19,15 @@ export const useGame = () => {
 
   const [matchCheckInProgress, setMatchCheckInProgress] = useState(false);
 
+  const restartGame = useCallback(() => {
+    setGameState({
+      shapes: getRandomShapes(PAIR_COUNT),
+      selectedShape: null,
+      score: 0,
+      isComplete: false,
+    });
+  }, []);
+
   const handleShapeClick = useCallback(
     (shapeId: string) => {
       if (matchCheckInProgress) return;
@@ -23,6 +37,7 @@ export const useGame = () => {
         if (!clickedShape || clickedShape.matched) return prev;
 
         if (!prev.selectedShape) {
+          playSound(CARD_FLIP_SFX);
           return {
             ...prev,
             selectedShape: clickedShape,
@@ -35,15 +50,10 @@ export const useGame = () => {
           prev.selectedShape.type === clickedShape.type &&
           prev.selectedShape.color === clickedShape.color;
 
-        if (isMatch) {
-          playSound(CARD_MATCH_SFX);
-        } else {
-          playSound(CARD_FLIP_SFX);
-        }
-
         setMatchCheckInProgress(true);
 
         if (!isMatch) {
+          playSound(CARD_FLIP_SFX);
           return {
             ...prev,
             selectedShape: clickedShape,
@@ -64,6 +74,12 @@ export const useGame = () => {
         });
 
         const allMatched = updatedShapes.every((shape) => shape.matched);
+
+        if (isMatch && !allMatched) {
+          playSound(CARD_MATCH_SFX);
+        } else if (allMatched) {
+          playSound(GAME_COMPLETE_SFX);
+        }
 
         return {
           shapes: updatedShapes,
@@ -109,5 +125,6 @@ export const useGame = () => {
   return {
     gameState,
     handleShapeClick,
+    restartGame,
   };
 };
