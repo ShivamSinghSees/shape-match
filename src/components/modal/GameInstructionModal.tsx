@@ -55,8 +55,7 @@ export const GameInstructions: React.FC<GameInstructionsProps> = ({
               <div className="bg-pink-50 p-4 rounded-lg">
                 <h3 className="font-bold text-pink-700 mb-2">Scoring:</h3>
                 <p className="text-pink-800">
-                  Each matched pair earns you 10 points. Try to complete the
-                  game with the highest score!
+                  Each matched pair earns you 10 points.
                 </p>
               </div>
             </div>

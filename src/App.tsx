@@ -35,7 +35,7 @@ function App() {
         className="text-2xl md:text-4xl font-bold text-purple-600 mb-8 flex items-center"
       >
         <Sparkles className="mr-2" />
-        Memory Card Game
+        Shape Match
       </motion.div>
 
       <div className="w-full max-w-2xl">
