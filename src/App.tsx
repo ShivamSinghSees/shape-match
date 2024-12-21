@@ -39,7 +39,11 @@ function App() {
       </motion.div>
 
       <div className="w-full max-w-2xl">
-        <ScoreBoard score={gameState.score} isComplete={gameState.isComplete} />
+        <ScoreBoard
+          onRestart={restartGame}
+          score={gameState.score}
+          isComplete={gameState.isComplete}
+        />
         <GameBoard gameState={gameState} onCardClick={handleShapeClick} />
       </div>
     </div>

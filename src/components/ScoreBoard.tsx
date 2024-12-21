@@ -2,18 +2,20 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Trophy } from "lucide-react";
 import Confetti from "react-confetti";
+import { RiResetLeftFill } from "react-icons/ri";
 
 interface ScoreBoardProps {
   score: number;
   isComplete: boolean;
+  onRestart: () => void;
 }
 
 export const ScoreBoard: React.FC<ScoreBoardProps> = ({
   score,
   isComplete,
+  onRestart,
 }) => {
   const rootContainer = document.getElementById("root");
-
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -21,7 +23,7 @@ export const ScoreBoard: React.FC<ScoreBoardProps> = ({
       className="bg-white p-4 rounded-lg shadow-lg mb-4 flex items-center justify-between"
     >
       <div className="text-2xl font-bold text-purple-600">Score: {score}</div>
-      {isComplete && (
+      {isComplete ? (
         <>
           <motion.div
             initial={{ scale: 0 }}
@@ -38,6 +40,12 @@ export const ScoreBoard: React.FC<ScoreBoardProps> = ({
             recycle={false}
           />
         </>
+      ) : (
+        <RiResetLeftFill
+          className="cursor-pointer"
+          size={25}
+          onClick={onRestart}
+        />
       )}
     </motion.div>
   );
