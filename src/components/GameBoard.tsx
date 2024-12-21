@@ -2,7 +2,6 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Card } from "./Card";
 import { GameState } from "../types/game";
-// import useSound from 'use-sound';
 
 interface GameBoardProps {
   gameState: GameState;
@@ -13,9 +12,6 @@ export const GameBoard: React.FC<GameBoardProps> = ({
   gameState,
   onCardClick,
 }) => {
-  // const [playMatch] = useSound('/sounds/match.mp3');
-  // const [playSelect] = useSound('/sounds/select.mp3');
-
   const handleCardClick = (shapeId: string) => {
     onCardClick(shapeId);
   };
