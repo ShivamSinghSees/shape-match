@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { GameState } from "../types/game";
 import { getRandomShapes } from "../utils/shapeUtils";
-import { audioManager, playSound } from "../utils/soundUtlis";
+import { playSound } from "../utils/soundUtlis";
 import {
   CARD_FLIP_SFX,
   CARD_MATCH_SFX,
@@ -92,15 +92,8 @@ export const useGame = () => {
     [matchCheckInProgress]
   );
 
-  async function preLoadSFX() {
-    await audioManager.preloadSound(CARD_FLIP_SFX);
-    await audioManager.preloadSound(CARD_MATCH_SFX);
-    await audioManager.preloadSound(GAME_COMPLETE_SFX);
-  }
-
   useEffect(() => {
     if (matchCheckInProgress) {
-      preLoadSFX();
       const timer = setTimeout(() => {
         setGameState((prev) => {
           const selectedShape = prev.selectedShape;
